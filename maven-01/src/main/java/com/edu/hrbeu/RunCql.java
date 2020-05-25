@@ -31,7 +31,7 @@ public class RunCql {
 	}
 	 
 	public void check(String preDir,String regDir){
-		//读取门诊登记表和门诊处方表,reglist是登记表，prelist是处方表
+		//reglist是登记表，prelist是处方表
 		String[][] prelist = null;
 		String[][] reglist = null;
 		try {
