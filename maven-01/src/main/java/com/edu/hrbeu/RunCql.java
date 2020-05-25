@@ -29,6 +29,10 @@ public class RunCql {
 	public StatementResult runCql(String itemname,String rulescode,Session session){
 		return session.run(new CreateCql().createTypeOne(itemname, rulescode));
 	}
+	
+	public StatementResult runCqlTwo(String itemcode,String rulescode,Session session) {
+		return session.run(new CreateCql().createTypeTwo(itemcode, rulescode));
+	}
 	 
 	public void check(String preDir,String regDir){
 		//reglist是登记表，prelist是处方表
@@ -54,10 +58,15 @@ public class RunCql {
 				//System.out.println(age + "000000000");
 				String itemname = prelist[j][4];
 				String precode = prelist[j][1];
+				String itemnode = prelist[j][3];
+				double price =Double.parseDouble(prelist[j][13]); 
+//				辅药审核
 				StatementResult resultC007 = new RunCql().runCql(itemname, "C007",session);
 				if(resultC007.hasNext()){
 					System.out.println("处方：" + precode + "药品：" + itemname + "辅药使用情况审核异常！");
 				}
+				
+//				老年人禁忌
 				if(age > 70 && age < 150){
 					//String itemnamec003 = prelist[j][4];
 					StatementResult resultC003 = new RunCql().runCql(itemname, "C003",session);
@@ -65,6 +74,20 @@ public class RunCql {
 						System.out.println("处方：" + precode + "药品：" + itemname + "老年人用药禁忌审核异常！");
 					}
 				}
+				
+				//药品限价审核
+				StatementResult resultB004 = new RunCql().runCqlTwo(itemnode, "B004", session);
+				if(resultB004.hasNext()){
+					//获取药品限定价格
+					Record recordB004 = resultB004.next();
+					String priceB004 = recordB004.values().toString().replace("\"", "").replace("[", "").replace("]", "");
+//					System.out.println(priceB004);
+					double price_check = Double.parseDouble(priceB004);
+//					System.out.println(price_check);
+					if(price > price_check)
+						System.out.println("处方： "+ precode + " 药品编号：" + itemnode + " 限定价格： " + price_check + " 药品限价审核未通过");
+				}
+				
 				//System.out.println("处方：" + precode + "药品：" + itemname + "正常");
 				j ++;
 			}
