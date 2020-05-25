@@ -20,6 +20,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 public class RunCql {
 	public static void main(String[] args){
+		//提交测试
 		String predir = "E:\\json_to_rdf\\处方.xlsx";
 		String resdir = "E:\\json_to_rdf\\登记表.xlsx";
 		
