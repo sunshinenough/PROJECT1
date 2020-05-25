@@ -20,11 +20,11 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 public class RunCql {
 	public static void main(String[] args){
-		//提交测试1
-//		String predir = "E:\\json_to_rdf\\处方.xlsx";
-//		String resdir = "E:\\json_to_rdf\\登记表.xlsx";
-		String predir = "D:\\文件\\医保业务规则\\医保业务规则排序后\\门诊处方表-副本.xlsx";
-		String regdir = "D:\\文件\\医保业务规则\\医保业务规则排序后\\门诊登记表-副本.xlsx";
+		
+		String predir = "E:\\json_to_rdf\\处方.xlsx";
+		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
+//		String predir = "D:\\文件\\医保业务规则\\医保业务规则排序后\\门诊处方表-副本.xlsx";
+//		String regdir = "D:\\文件\\医保业务规则\\医保业务规则排序后\\门诊登记表-副本.xlsx";
 		
 		new RunCql().check(predir,regdir);
 	}
