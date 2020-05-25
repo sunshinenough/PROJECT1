@@ -23,7 +23,8 @@ public class RunCql {
 		//上传测试
 		String predir = "E:\\json_to_rdf\\处方.xlsx";
 		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
-
+		
+		//另外的路径
 		
 		new RunCql().check(predir,regdir);
 	}
