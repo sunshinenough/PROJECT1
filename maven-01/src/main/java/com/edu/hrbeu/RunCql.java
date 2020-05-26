@@ -20,14 +20,12 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
 public class RunCql {
 	public static void main(String[] args){
-	
-		String predir = "D:\\BaiduNetdiskDownload\\IDEA_code\\处方.xlsx";
-		String regdir = "D:\\BaiduNetdiskDownload\\IDEA_code\\登记表.xlsx";
+		//上传测试
+		String predir = "E:\\json_to_rdf\\处方.xlsx";
+		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
 		
-		//另外的路径
-//		String predir = "E:\\json_to_rdf\\处方.xlsx";
-//		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
-
+		//添加另外的路径
+		
 		
 		new RunCql().check(predir,regdir);
 	}
