@@ -26,10 +26,7 @@ public class RunCql {
 		String predir = "E:\\json_to_rdf\\处方.xlsx";
 		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
 		
-		//另外的路径
-
-		//添加路径
-		
+		//本地的路径
 
 		
 		new RunCql().check(predir,regdir);
