@@ -30,7 +30,7 @@ public class RunCql {
 
 		
 
-		//测试111
+		
 
 
 		new RunCql().check(predir,regdir);
