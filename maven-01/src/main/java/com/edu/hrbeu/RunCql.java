@@ -59,6 +59,7 @@ public class RunCql {
 		Session session = driver.session();
 		//注意判断字符串是否相等用equals方法
 		while(i < reglist.length){
+			int itemindex = 0;
 			while(j < prelist.length && reglist[i][3].equals(prelist[j][0])){
 				int age = Integer.parseInt(reglist[i][8]);
 				//System.out.println(age + "000000000");
