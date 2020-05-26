@@ -7,6 +7,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.xmlbeans.impl.xb.xsdschema.Public;
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.GraphDatabase;
@@ -22,31 +23,35 @@ import org.omg.CORBA.PRIVATE_MEMBER;
 
 
 public class RunCql {
+	
+	private static CreateCql createCql = new CreateCql();
+	private static RunCql runCql = new RunCql();
 	public static void main(String[] args){
 		//上传测试
 		
 		String predir = "E:\\json_to_rdf\\处方.xlsx";
 		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
 
-	
-
-		new RunCql().check(predir,regdir);
+		runCql.check(predir,regdir);
 	}
+	
 	//private final Session session = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "123456")).session();
 	public StatementResult runCql(String itemname,String rulescode,Session session){
-		return session.run(new CreateCql().createTypeOne(itemname, rulescode));
+//		CreateCql createCql = new CreateCql();
+		return session.run(createCql.createTypeOne(itemname, rulescode));
 	}
 	
 	public StatementResult runCqlTwo(String itemcode,String rulescode,Session session) {
-		return session.run(new CreateCql().createTypeTwo(itemcode, rulescode));
+		return session.run(createCql.createTypeTwo(itemcode, rulescode));
 	}
 	
 	public StatementResult runCqlThree(String itemCode,String itemCode2,Session session) {
-		return session.run(new CreateCql().createTypeThree(itemCode, itemCode2));
+		return session.run(createCql.createTypeThree(itemCode, itemCode2));
 	}
 	 
 	public void check(String preDir,String regDir){
 		//reglist是登记表，prelist是处方表
+//		RunCql runCql = new RunCql();
 		String[][] prelist = null;
 		String[][] reglist = null;
 		try {
@@ -80,7 +85,7 @@ public class RunCql {
 				
 				double price =Double.parseDouble(prelist[j][13]); 
 //				辅药审核
-				StatementResult resultC007 = new RunCql().runCql(itemname, "C007",session);
+				StatementResult resultC007 = runCql.runCql(itemname, "C007",session);
 				if(resultC007.hasNext()){
 					System.out.println("处方：" + precode + "药品：" + itemname + "辅药使用情况审核异常！");
 				}
@@ -88,14 +93,14 @@ public class RunCql {
 //				老年人禁忌
 				if(age > 70 && age < 150){
 					//String itemnamec003 = prelist[j][4];
-					StatementResult resultC003 = new RunCql().runCql(itemname, "C003",session);
+					StatementResult resultC003 = runCql.runCql(itemname, "C003",session);
 					if(resultC003.hasNext()){
 						System.out.println("处方：" + precode + "药品：" + itemname + "老年人用药禁忌审核异常！");
 					}
 				}
 				
 				//药品限价审核
-				StatementResult resultB004 = new RunCql().runCqlTwo(itemnode, "B004", session);
+				StatementResult resultB004 = runCql.runCqlTwo(itemnode, "B004", session);
 				if(resultB004.hasNext()){
 					//获取药品限定价格
 					Record recordB004 = resultB004.next();
@@ -115,7 +120,7 @@ public class RunCql {
 			for(judgei = 0;judgei < (itemindex-1);judgei ++){
 				for(judgej = (judgei+1);judgej < itemindex;judgej++){
 					//执行查询
-					StatementResult resultUnion = new RunCql().runCqlThree(itemlist[judgei], itemlist[judgej], session);
+					StatementResult resultUnion = runCql.runCqlThree(itemlist[judgei], itemlist[judgej], session);
 					if(resultUnion.hasNext()){
 						Record recordUnion = resultUnion.next();
 						String union = recordUnion.values().toString().replace("\"", "").replace("[", "").replace("]", "");
