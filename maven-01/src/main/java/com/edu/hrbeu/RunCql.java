@@ -18,6 +18,7 @@ import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.omg.CORBA.PRIVATE_MEMBER;
 
 
 public class RunCql {
@@ -39,6 +40,10 @@ public class RunCql {
 	public StatementResult runCqlTwo(String itemcode,String rulescode,Session session) {
 		return session.run(new CreateCql().createTypeTwo(itemcode, rulescode));
 	}
+	
+	public StatementResult runCqlThree(String itemCode,String itemCode2,Session session) {
+		return session.run(new CreateCql().createTypeThree(itemCode, itemCode2));
+	}
 	 
 	public void check(String preDir,String regDir){
 		//reglist是登记表，prelist是处方表
@@ -59,6 +64,8 @@ public class RunCql {
 		Session session = driver.session();
 		//注意判断字符串是否相等用equals方法
 		while(i < reglist.length){
+			//定义患者用药、项目列表
+			String[] itemlist = new String[100];
 			int itemindex = 0;
 			while(j < prelist.length && reglist[i][3].equals(prelist[j][0])){
 				int age = Integer.parseInt(reglist[i][8]);
@@ -66,6 +73,11 @@ public class RunCql {
 				String itemname = prelist[j][4];
 				String precode = prelist[j][1];
 				String itemnode = prelist[j][3];
+				
+				//记录患者用药
+				itemlist[itemindex] = itemnode;
+				itemindex ++;
+				
 				double price =Double.parseDouble(prelist[j][13]); 
 //				辅药审核
 				StatementResult resultC007 = new RunCql().runCql(itemname, "C007",session);
@@ -92,11 +104,28 @@ public class RunCql {
 					double price_check = Double.parseDouble(priceB004);
 //					System.out.println(price_check);
 					if(price > price_check)
-						System.out.println("处方： "+ precode + " 药品编号：" + itemnode + " 限定价格： " + price_check + " 药品限价审核未通过");
+						System.out.println("门诊登记号： "+ precode + " 药品编号：" + itemnode + " 限定价格： " + price_check + " 药品限价审核未通过");
 				}
 				
 				//System.out.println("处方：" + precode + "药品：" + itemname + "正常");
 				j ++;
+			}
+			//判断两种药是否不能同时出现在一个药方中
+			int judgei,judgej;
+			for(judgei = 0;judgei < (itemindex-1);judgei ++){
+				for(judgej = (judgei+1);judgej < itemindex;judgej++){
+					//执行查询
+					StatementResult resultUnion = new RunCql().runCqlThree(itemlist[judgei], itemlist[judgej], session);
+					if(resultUnion.hasNext()){
+						Record recordUnion = resultUnion.next();
+						String union = recordUnion.values().toString().replace("\"", "").replace("[", "").replace("]", "");
+						System.out.println("登记编号： "+ reglist[i][3] + " 对应的处方中同时使用了药品1：" + itemlist[judgei] + " 药品2： " + itemlist[judgej] + union );
+					}
+//					System.out.println(itemlist[judgei]);
+//					if(itemlist[judgei].equals("X-J01FA-K067-E001-1V")){
+//						System.out.println("登记编号： "+ reglist[i][3] + " 对应的处方中同时使用了药品1：" + itemlist[judgei] + " 药品2： " + itemlist[judgej] + " 药品不能同时使用");
+//					}
+				}
 			}
 			i ++;
 		}
