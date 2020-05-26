@@ -19,6 +19,10 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
+/**
+ * @author 孙洪恩
+ *
+ */
 public class RunCql {
 	public static void main(String[] args){
 		//上传测试
@@ -26,6 +30,10 @@ public class RunCql {
 		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
 		
 		//另外的路径
+
+		//添加路径
+		
+
 		
 		new RunCql().check(predir,regdir);
 	}
