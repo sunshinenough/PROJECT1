@@ -19,10 +19,7 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 
-/**
- * @author 孙洪恩
- *
- */
+
 public class RunCql {
 	public static void main(String[] args){
 		//上传测试
