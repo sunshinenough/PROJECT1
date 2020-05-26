@@ -27,8 +27,7 @@ public class RunCql {
 		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
 		
 		//另外的路径
-
-		//添加路径
+		//比如这是一个代码
 		
 
 		
