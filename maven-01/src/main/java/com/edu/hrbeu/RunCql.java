@@ -1,6 +1,7 @@
 package com.edu.hrbeu;
 import java.io.File;
 
+import org.apache.lucene.analysis.miscellaneous.WordDelimiterFilter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -24,8 +25,7 @@ public class RunCql {
 		String predir = "E:\\json_to_rdf\\处方.xlsx";
 		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
 		
-		//添加另外的路径
-		
+		//另外的路径
 		
 		new RunCql().check(predir,regdir);
 	}
