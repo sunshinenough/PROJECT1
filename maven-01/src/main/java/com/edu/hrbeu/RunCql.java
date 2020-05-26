@@ -32,6 +32,7 @@ public class RunCql {
 
 		//测试111
 
+
 		new RunCql().check(predir,regdir);
 	}
 	//private final Session session = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "123456")).session();
