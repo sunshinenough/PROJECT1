@@ -27,6 +27,8 @@ public class RunCql {
 		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
 		
 		//本地的路径
+		//冲突测试1
+		//冲突测试
 
 		
 		new RunCql().check(predir,regdir);
