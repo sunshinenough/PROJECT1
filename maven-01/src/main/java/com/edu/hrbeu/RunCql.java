@@ -27,10 +27,11 @@ public class RunCql {
 	private static CreateCql createCql = new CreateCql();
 	private static RunCql runCql = new RunCql();
 	public static void main(String[] args){
-		//上传测试
 		
-		String predir = "E:\\json_to_rdf\\处方.xlsx";
-		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
+//		String predir = "E:\\json_to_rdf\\处方.xlsx";
+//		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
+		String predir = "D:\\文件\\医保业务规则\\医保业务规则排序后\\门诊处方表-副本.xlsx";
+		String regdir = "D:\\文件\\医保业务规则\\医保业务规则排序后\\门诊登记表-副本.xlsx";
 
 		runCql.check(predir,regdir);
 	}
@@ -97,6 +98,17 @@ public class RunCql {
 					if(resultC003.hasNext()){
 						System.out.println("处方：" + precode + "药品：" + itemname + "老年人用药禁忌审核异常！");
 					}
+				}
+				
+//				儿童禁忌
+				StatementResult resultC001 = runCql.runCql(itemname, "C001", session);
+				if(resultC001.hasNext()) {
+					Record recordC001 = resultC001.next();
+					int endAge = Integer.valueOf(recordC001.get("properties(r)").get("EndAge").asString());
+					if(age <= endAge) {
+						System.out.println("处方：" + precode + "药品：" + itemname + "儿童用药禁忌审核异常！");
+					}
+					
 				}
 				
 				//药品限价审核
