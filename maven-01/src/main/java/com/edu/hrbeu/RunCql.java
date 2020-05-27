@@ -116,8 +116,8 @@ public class RunCql {
 				if(resultB004.hasNext()){
 					//获取药品限定价格
 					Record recordB004 = resultB004.next();
-					String priceB004 = recordB004.values().toString().replace("\"", "").replace("[", "").replace("]", "");
-//					System.out.println(priceB004);
+					String priceB004 = recordB004.get("properties(r)").get("LimitPrice").asString();
+					System.out.println(priceB004);
 					double price_check = Double.parseDouble(priceB004);
 //					System.out.println(price_check);
 					if(price > price_check)
@@ -135,7 +135,7 @@ public class RunCql {
 					StatementResult resultUnion = runCql.runCqlThree(itemlist[judgei], itemlist[judgej], session);
 					if(resultUnion.hasNext()){
 						Record recordUnion = resultUnion.next();
-						String union = recordUnion.values().toString().replace("\"", "").replace("[", "").replace("]", "");
+						String union = recordUnion.get("properties(r)").get("relation").asString();
 						System.out.println("登记编号： "+ reglist[i][3] + " 对应的处方中同时使用了药品1：" + itemlist[judgei] + " 药品2： " + itemlist[judgej] + union );
 					}
 //					System.out.println(itemlist[judgei]);
