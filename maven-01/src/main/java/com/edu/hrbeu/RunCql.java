@@ -1,5 +1,7 @@
 package com.edu.hrbeu;
+import java.awt.List;
 import java.io.File;
+import java.util.ArrayList;
 
 import org.apache.lucene.analysis.miscellaneous.WordDelimiterFilter;
 import org.apache.poi.ss.usermodel.Cell;
@@ -8,6 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.xmlbeans.impl.xb.xsdschema.Public;
+import org.neo4j.cypher.internal.frontend.v2_3.perty.recipe.Pretty.nestWith;
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
 import org.neo4j.driver.v1.GraphDatabase;
@@ -20,6 +23,9 @@ import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.omg.CORBA.PRIVATE_MEMBER;
+import java.util.*;
+import io.netty.channel.group.ChannelMatcher;
+import scala.collection.mutable.LinkedList;
 
 
 public class RunCql {
@@ -71,18 +77,38 @@ public class RunCql {
 		int j = 1;
 		Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "123456"));
 		Session session = driver.session();
-		//注意判断字符串是否相等用equals方法
+		//二维数组cqlRules存储下面while循环中的cqlmain,目前是四种规则
+		//String[][] cqlRules = new String[4][8];
+		ArrayList<String[]> cqlmains = new ArrayList<>();
 		
+		//注意判断字符串是否相等用equals方法
+		int index = 0;
 		StatementResult resultmain = runCql.runCqlmain(session);
 		while(resultmain.hasNext()){
 			Record recordMain = resultmain.next();
 			String cqlmaintemp = recordMain.values().toString().replace("\"", "").replace("[", "").replace("]", "").replace(" ", "");
 			String[] cqlmain = cqlmaintemp.split(",");
-			for(int a=0;a<cqlmain.length;a++)
+			/*
+			for(int a=0;a<cqlmain.length;a++){
 				System.out.println(cqlmain[a]);
-			
+				//cqlRules[index][a] = cqlmain[a];
+			}
+			*/
+			index ++;
+			cqlmains.add(cqlmain);
 		}
-
+		/*
+		for(int x = 0;x < cqlRules.length;x ++){
+			for(int y = 0;y < cqlRules[0].length;y ++){
+				System.out.println(cqlRules[x][y]);
+			}
+		}
+		*/
+		for(int x = 0;x < cqlmains.size();x ++){
+			for(int y = 0;y < 8;y ++){
+				System.out.println(cqlmains.get(x)[y]);
+			}
+		}
 		while(i < reglist.length){
 			//定义患者用药、项目列表
 			String[] itemlist = new String[100];
