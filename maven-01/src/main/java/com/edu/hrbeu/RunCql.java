@@ -122,7 +122,10 @@ public class RunCql {
 				itemlist[itemindex] = itemnode;
 				itemindex ++;
 				
-				double price =Double.parseDouble(prelist[j][13]); 
+				double price =Double.parseDouble(prelist[j][13]);
+				
+				
+				
 //				辅药审核
 				StatementResult resultC007 = runCql.runCql(itemname, "C007",session);
 				if(resultC007.hasNext()){
