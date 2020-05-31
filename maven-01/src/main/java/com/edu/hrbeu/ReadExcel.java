@@ -18,6 +18,7 @@ public class ReadExcel {
 		try {
 			String predir = "D:\\BaiduNetdiskDownload\\IDEA_code\\处方.xlsx";
 			String resdir = "D:\\BaiduNetdiskDownload\\IDEA_code\\登记表.xlsx";
+			
 			String[][] prelist = new ReadExcel().readExcel(predir);
 			String[][] reglist = new ReadExcel().readExcel(resdir);
 		} catch (Exception e) {
