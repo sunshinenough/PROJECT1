@@ -29,8 +29,8 @@ public class RunCql {
 	public static void main(String[] args){
 		//上传测试
 		
-		String predir = "E:\\json_to_rdf\\处方.xlsx";
-		String regdir = "E:\\json_to_rdf\\登记表.xlsx";
+		String predir = "D:\\业务数据\\处方.xlsx";
+		String regdir = "D:\\业务数据\\登记表.xlsx";
 
 		runCql.check(predir,regdir);
 	}
@@ -47,6 +47,10 @@ public class RunCql {
 	
 	public StatementResult runCqlThree(String itemCode,String itemCode2,Session session) {
 		return session.run(createCql.createTypeThree(itemCode, itemCode2));
+	}
+	
+	public StatementResult runCqlmain(Session session){
+		return session.run(createCql.createMain());
 	}
 	 
 	public void check(String preDir,String regDir){
@@ -68,6 +72,17 @@ public class RunCql {
 		Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "123456"));
 		Session session = driver.session();
 		//注意判断字符串是否相等用equals方法
+		
+		StatementResult resultmain = runCql.runCqlmain(session);
+		while(resultmain.hasNext()){
+			Record recordMain = resultmain.next();
+			String cqlmaintemp = recordMain.values().toString().replace("\"", "").replace("[", "").replace("]", "").replace(" ", "");
+			String[] cqlmain = cqlmaintemp.split(",");
+			for(int a=0;a<cqlmain.length;a++)
+				System.out.println(cqlmain[a]);
+			
+		}
+
 		while(i < reglist.length){
 			//定义患者用药、项目列表
 			String[] itemlist = new String[100];
