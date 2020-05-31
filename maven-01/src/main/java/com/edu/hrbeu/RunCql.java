@@ -80,11 +80,7 @@ public class RunCql {
 		//二维数组cqlRules存储下面while循环中的cqlmain,目前是四种规则
 		//String[][] cqlRules = new String[4][8];
 		ArrayList<String[]> cqlmains = new ArrayList<>();
-//<<<<<<< HEAD
-//=======
-//		
-//>>>>>>> branch 'master' of https://github.com/sunshinenough/PROJECT1.git
-//		//注意判断字符串是否相等用equals方法
+		//注意判断字符串是否相等用equals方法
 		int index = 0;
 		StatementResult resultmain = runCql.runCqlmain(session);
 		while(resultmain.hasNext()){
