@@ -2,7 +2,7 @@ package cn.edu.heu;
 import java.awt.List;
 import java.io.File;
 import java.util.ArrayList;
-
+import java.util.LinkedList;
 import org.apache.lucene.analysis.miscellaneous.WordDelimiterFilter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -25,7 +25,6 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.omg.CORBA.PRIVATE_MEMBER;
 import java.util.*;
 import io.netty.channel.group.ChannelMatcher;
-import scala.collection.mutable.LinkedList;
 
 
 public class RunCql {
@@ -41,30 +40,6 @@ public class RunCql {
 		runCql.check(predir,regdir);
 	}
 	
-	//private final Session session = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "123456")).session();
-	public StatementResult runCql(String itemname,String rulescode,Session session){
-//		CreateCql createCql = new CreateCql();
-		return session.run(createCql.createTypeOne(itemname, rulescode));
-	}
-	public StatementResult runCql1(String[] strings,String sent,Session session){
-//		CreateCql createCql = new CreateCql();
-		return session.run(createCql.createType1(strings,sent));
-	}
-	public StatementResult runCqlTwo(String itemcode,String rulescode,Session session) {
-		return session.run(createCql.createTypeTwo(itemcode, rulescode));
-	}
-	public StatementResult runCql2(String[] strings,String sent,Session session){
-//		CreateCql createCql = new CreateCql();
-		return session.run(createCql.createType2(strings,sent));
-	}
-	public StatementResult runCqlThree(String itemCode,String itemCode2,Session session) {
-		return session.run(createCql.createTypeThree(itemCode, itemCode2));
-	}
-	
-	public StatementResult runCqlmain(Session session){
-		return session.run(createCql.createMain());
-	}
-	 
 	public void check(String preDir,String regDir){
 		//reglist是登记表，prelist是处方表
 //		RunCql runCql = new RunCql();
@@ -81,43 +56,37 @@ public class RunCql {
 		//不读表头
 		int i = 1;
 		int j = 1;
+		
 		Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "123456"));
 		Session session = driver.session();
+		
 		//二维数组cqlRules存储下面while循环中的cqlmain,目前是四种规则
 		//String[][] cqlRules = new String[4][8];
-		ArrayList<String[]> cqlmains = new ArrayList<>();
+		LinkedList<String[]> cqlmains = new LinkedList<>();
 		//注意判断字符串是否相等用equals方法
 		int index = 0;
-		StatementResult resultmain = runCql.runCqlmain(session);
+		String cqltypemain = createCql.createMain();
+		StatementResult resultmain = session.run(cqltypemain);
 		while(resultmain.hasNext()){
 			Record recordMain = resultmain.next();
 			String cqlmaintemp = recordMain.values().toString().replace("\"", "").replace("[", "").replace("]", "").replace(" ", "");
 			String[] cqlmain = cqlmaintemp.split(",");
-			/*
-			for(int a=0;a<cqlmain.length;a++){
-				System.out.println(cqlmain[a]);
-				//cqlRules[index][a] = cqlmain[a];
-			}
-			*/
 			index ++;
 			cqlmains.add(cqlmain);
 		}
-		/*
-		for(int x = 0;x < cqlRules.length;x ++){
-			for(int y = 0;y < cqlRules[0].length;y ++){
-				System.out.println(cqlRules[x][y]);
-			}
-		}
-		*/
+		
 		for(int x = 0;x < cqlmains.size();x ++){
 			for(int y = 0;y < 8;y ++){
 				System.out.println(cqlmains.get(x)[y]);
 			}
 		}
+		
 		while(i < reglist.length){
+			
 			//定义患者用药、项目列表
-			String[] itemlist = new String[100];
+			String[] itemlist = new String[105];
 			int itemindex = 0;
+			
 			while(j < prelist.length && reglist[i][3].equals(prelist[j][0])){
 				int age = Integer.parseInt(reglist[i][8]);
 				//System.out.println(age + "000000000");
@@ -132,81 +101,40 @@ public class RunCql {
 				double price =Double.parseDouble(prelist[j][13]); 
 				for(String[] cqlmain : cqlmains){
 					if(cqlmain[0].equals("1")){
+						
 						//以后会改为：业务数据中的表头各项内容
 						if(cqlmain[2].equals("object")){
-							//System.out.println(itemnode);
-							StatementResult result = runCql.runCql1(cqlmain,itemname,session);
+							String cqltype1 = createCql.createType1(cqlmain, itemname);
+							StatementResult result = session.run(cqltype1);
 							if(result.hasNext()){
-								System.out.println("new     处方：" + precode + "药品：" + itemname + "辅药使用情况审核异常！");
+								String[] rule = result.next().values().toString().replace("\"", "").replace("[", "").replace("]", "").replace(" ", "").split(",");
+								System.out.println("处方：" + precode + cqlmain[2] + itemname + rule[0] + "异常");
 							}
 						}
 					}
+
 					if(cqlmain[0].equals("2")){
 						if(cqlmain[2].equals("objectCode")){
-							StatementResult result = runCql.runCql2(cqlmain,itemnode,session);
+							String cqltype2 = createCql.createType2(cqlmain, itemnode);
+							StatementResult result = session.run(cqltype2);
 							if(result.hasNext()){
 								//获取药品限定价格
-								Record recordB004 = result.next();
-								String priceB004 = recordB004.values().toString().replace("\"", "").replace("[", "").replace("]", "");
-//								System.out.println(priceB004);
-								double price_check = Double.parseDouble(priceB004);
-//								System.out.println(price_check);
-								if(price > price_check)
-									System.out.println("new    门诊登记号： "+ precode + " 药品编号：" + itemnode + " 限定价格： " + price_check + " 药品限价审核未通过");
+								Record record2= result.next();
+								String recordtype2 = record2.values().toString().replace("\"", "").replace("[", "").replace("]", "");
+								String[] rectype2 = recordtype2.split(",");
+								if(cqlmain[5].equals("PRICE")){
+									if(cqlmain[6].equals("<=")){
+										if(price > Double.parseDouble(rectype2[1])){
+											System.out.println("门诊登记号： "+ precode + " 药品编号：" + itemnode + " 限定价格： " + rectype2[1] + rectype2[0] + "异常");
+										}
+									}
+								}
 							}
 						}
 					}
 				}
-//				辅药审核
-				StatementResult resultC007 = runCql.runCql(itemname, "C007",session);
-				if(resultC007.hasNext()){
-					System.out.println("处方：" + precode + "药品：" + itemname + "辅药使用情况审核异常！");
-				}
-				/*
-//				老年人禁忌
-				if(age > 70 && age < 150){
-					//String itemnamec003 = prelist[j][4];
-					StatementResult resultC003 = runCql.runCql(itemname, "C003",session);
-					if(resultC003.hasNext()){
-						System.out.println("处方：" + precode + "药品：" + itemname + "老年人用药禁忌审核异常！");
-					}
-				}
-				*/
-				//药品限价审核
-				StatementResult resultB004 = runCql.runCqlTwo(itemnode, "B004", session);
-				if(resultB004.hasNext()){
-					//获取药品限定价格
-					Record recordB004 = resultB004.next();
-					String priceB004 = recordB004.values().toString().replace("\"", "").replace("[", "").replace("]", "");
-//					System.out.println(priceB004);
-					double price_check = Double.parseDouble(priceB004);
-//					System.out.println(price_check);
-					if(price > price_check)
-						System.out.println("门诊登记号： "+ precode + " 药品编号：" + itemnode + " 限定价格： " + price_check + " 药品限价审核未通过");
-				}
-				
-				//System.out.println("处方：" + precode + "药品：" + itemname + "正常");
 				j ++;
 			}
-			/*
-			//判断两种药是否不能同时出现在一个药方中
-			int judgei,judgej;
-			for(judgei = 0;judgei < (itemindex-1);judgei ++){
-				for(judgej = (judgei+1);judgej < itemindex;judgej++){
-					//执行查询
-					StatementResult resultUnion = runCql.runCqlThree(itemlist[judgei], itemlist[judgej], session);
-					if(resultUnion.hasNext()){
-						Record recordUnion = resultUnion.next();
-						String union = recordUnion.values().toString().replace("\"", "").replace("[", "").replace("]", "");
-						System.out.println("登记编号： "+ reglist[i][3] + " 对应的处方中同时使用了药品1：" + itemlist[judgei] + " 药品2： " + itemlist[judgej] + union );
-					}
-//					System.out.println(itemlist[judgei]);
-//					if(itemlist[judgei].equals("X-J01FA-K067-E001-1V")){
-//						System.out.println("登记编号： "+ reglist[i][3] + " 对应的处方中同时使用了药品1：" + itemlist[judgei] + " 药品2： " + itemlist[judgej] + " 药品不能同时使用");
-//					}
-				}
-			}
-			*/
 			i ++;
 		}
 		driver.close();

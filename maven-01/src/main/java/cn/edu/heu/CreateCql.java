@@ -24,7 +24,7 @@ public class CreateCql {
 	}
 	public String createType2(String[] strings,String sent){
 		if(strings.length != 0 || strings == null){
-			String cql = "MATCH (m:" + strings[1] + ")-[r:relation]->(n:" + strings[2] + ") where n.Code ='" + sent + "'and m.RulesCode = '" + strings[3] + "' return r." + strings[5];
+			String cql = "MATCH (m:" + strings[1] + ")-[r:relation]->(n:" + strings[2] + ") where n.Code ='" + sent + "'and m.RulesCode = '" + strings[3] + "' return r.relation,r." + strings[5];
 			return cql;
 		}
 		return null;
