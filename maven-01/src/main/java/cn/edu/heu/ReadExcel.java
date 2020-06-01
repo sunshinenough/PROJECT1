@@ -19,19 +19,19 @@ public class ReadExcel {
 	//读取excel表格
 	public static void main(String[] args){
 		try {
-			String predir = "D:\\BaiduNetdiskDownload\\IDEA_code\\处方.xlsx";
-			String resdir = "D:\\BaiduNetdiskDownload\\IDEA_code\\登记表.xlsx";
+			String predir = "D:\\业务数据\\处方.xlsx";
+			String resdir = "D:\\业务数据\\登记表.xlsx";
 			
 			LinkedList<Map<String, String>> prelist = new ReadExcel().readExcel(predir);
 			LinkedList<Map<String, String>> reglist = new ReadExcel().readExcel(resdir);
-//			for(int i = 0;i < prelist.size();i ++){
-//				for (Map.Entry<String,String> entry : prelist.get(i).entrySet()) {
-//					 
-//				    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-//				 
-//				}
-//				
-//			}
+			for(int i = 0;i < prelist.size();i ++){
+				for (Map.Entry<String,String> entry : prelist.get(i).entrySet()) {
+					 
+				    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+				 
+				}
+				
+			}
 			String a = "Name";
 			System.out.println(reglist.get(10).get(a));
 		} catch (Exception e) {

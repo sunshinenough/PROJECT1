@@ -103,7 +103,7 @@ public class RunCql {
 					if(cqlmain[0].equals("1")){
 						
 						//以后会改为：业务数据中的表头各项内容
-						if(cqlmain[2].equals("object")){
+						if(cqlmain[2].equals("ItemName")){
 							String cqltype1 = createCql.createType1(cqlmain, itemname);
 							StatementResult result = session.run(cqltype1);
 							if(result.hasNext()){
@@ -114,8 +114,9 @@ public class RunCql {
 					}
 
 					if(cqlmain[0].equals("2")){
-						if(cqlmain[2].equals("objectCode")){
+						if(cqlmain[2].equals("ItemCode")){
 							String cqltype2 = createCql.createType2(cqlmain, itemcode);
+//							System.out.println(cqltype2);
 							StatementResult result = session.run(cqltype2);
 							if(result.hasNext()){
 								//获取药品限定价格
