@@ -22,14 +22,24 @@ public class ReadExcel {
 			String predir = "D:\\BaiduNetdiskDownload\\IDEA_code\\处方.xlsx";
 			String resdir = "D:\\BaiduNetdiskDownload\\IDEA_code\\登记表.xlsx";
 			
-			//Map<String, String> premap = new ReadExcel().readExcel(predir);
-			//Map<String, String> regmap = new ReadExcel().readExcel(resdir);
+			LinkedList<Map<String, String>> prelist = new ReadExcel().readExcel(predir);
+			LinkedList<Map<String, String>> reglist = new ReadExcel().readExcel(resdir);
+//			for(int i = 0;i < prelist.size();i ++){
+//				for (Map.Entry<String,String> entry : prelist.get(i).entrySet()) {
+//					 
+//				    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+//				 
+//				}
+//				
+//			}
+			String a = "Name";
+			System.out.println(reglist.get(10).get(a));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	public String[][] readExcel(String dir) throws IOException{
+	public LinkedList<Map<String, String>> readExcel(String dir) throws IOException{
 		
 		
 		XSSFWorkbook workbook = new XSSFWorkbook(dir);
@@ -45,12 +55,12 @@ public class ReadExcel {
 		int lastRowNum = sheet.getLastRowNum();
 		int lastCellNum = sheet.getRow(0).getLastCellNum();
 		String[][] pres = new String[lastRowNum + 1][lastCellNum];
-		Map<String, String> map = new HashMap<>();
+		
 		LinkedList<Map<String, String>> list = new LinkedList<>();
 		for(int i = 0; i <= lastRowNum; i++) {
 			XSSFRow row = sheet.getRow(i);
 			if(row!=null) {
-				
+				Map<String, String> map = new HashMap<>();
 				int cellNum = row.getLastCellNum();
 				for(int j = 0; j < cellNum; j++) {
 					XSSFCell cell = row.getCell(j);
@@ -65,7 +75,11 @@ public class ReadExcel {
 						}
 					}
 				}
-				list.add(map);
+				if(i != 0){
+					list.add(map);
+				}
+				
+				
 			}
 		}
 		/*
@@ -79,11 +93,11 @@ public class ReadExcel {
 		
 		workbook.close();
 		//释放掉二维数组
-		//pres = null;
-		System.out.println(list.get(1).get("Name"));
-		System.out.println(list.get(1).get("ItemCode"));
-		return pres;
-		//return map;
+		pres = null;
+		//System.out.println(list.get(0).get("Name"));
+		//System.out.println(list.get(1).get("ItemCode"));
+		//return pres;
+		return list;
 		
 	}
 }

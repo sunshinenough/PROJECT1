@@ -1,8 +1,7 @@
 package cn.edu.heu;
 import java.awt.List;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.LinkedList;
+
 import org.apache.lucene.analysis.miscellaneous.WordDelimiterFilter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -43,8 +42,8 @@ public class RunCql {
 	public void check(String preDir,String regDir){
 		//reglist是登记表，prelist是处方表
 //		RunCql runCql = new RunCql();
-		String[][] prelist = null;
-		String[][] reglist = null;
+		LinkedList<Map<String, String>> prelist = null;
+		LinkedList<Map<String, String>> reglist = null;
 		try {
 			prelist = new ReadExcel().readExcel(preDir);
 			reglist = new ReadExcel().readExcel(regDir);
@@ -53,9 +52,9 @@ public class RunCql {
 			e.printStackTrace();
 		}
 		//System.out.println(prelist.length);
-		//不读表头
-		int i = 1;
-		int j = 1;
+		//不用不读表头，表头被 当成map的key了
+		int linereg = 0;
+		int linepre = 0;
 		
 		Driver driver = GraphDatabase.driver("bolt://localhost:7687", AuthTokens.basic("neo4j", "123456"));
 		Session session = driver.session();
@@ -81,24 +80,25 @@ public class RunCql {
 			}
 		}
 		
-		while(i < reglist.length){
+		while(linereg < reglist.size()){
 			
 			//定义患者用药、项目列表
-			String[] itemlist = new String[105];
+			String[] itemlist = new String[120];
 			int itemindex = 0;
 			
-			while(j < prelist.length && reglist[i][3].equals(prelist[j][0])){
-				int age = Integer.parseInt(reglist[i][8]);
+			while(linepre < prelist.size() && reglist.get(linereg).get("ClinicRegisterCode").equals(prelist.get(linepre).get("ClinicRegisterCode"))){
+				int age = Integer.parseInt(reglist.get(linereg).get("Age"));
 				//System.out.println(age + "000000000");
-				String itemname = prelist[j][4];
-				String precode = prelist[j][1];
-				String itemnode = prelist[j][3];
+				String itemname = prelist.get(linepre).get("ItemName");
+				String precode = prelist.get(linepre).get("PreCode");
+				String itemcode = prelist.get(linepre).get("ItemCode");
 				
 				//记录患者用药
-				itemlist[itemindex] = itemnode;
+				
+				itemlist[itemindex] = itemcode;
 				itemindex ++;
 				
-				double price =Double.parseDouble(prelist[j][13]); 
+				double price =Double.parseDouble(prelist.get(linepre).get("PRICE")); 
 				for(String[] cqlmain : cqlmains){
 					if(cqlmain[0].equals("1")){
 						
@@ -115,7 +115,7 @@ public class RunCql {
 
 					if(cqlmain[0].equals("2")){
 						if(cqlmain[2].equals("objectCode")){
-							String cqltype2 = createCql.createType2(cqlmain, itemnode);
+							String cqltype2 = createCql.createType2(cqlmain, itemcode);
 							StatementResult result = session.run(cqltype2);
 							if(result.hasNext()){
 								//获取药品限定价格
@@ -125,7 +125,7 @@ public class RunCql {
 								if(cqlmain[5].equals("PRICE")){
 									if(cqlmain[6].equals("<=")){
 										if(price > Double.parseDouble(rectype2[1])){
-											System.out.println("门诊登记号： "+ precode + " 药品编号：" + itemnode + " 限定价格： " + rectype2[1] + rectype2[0] + "异常");
+											System.out.println("门诊登记号： "+ precode + " 药品编号：" + itemcode + " 限定价格： " + rectype2[1] + rectype2[0] + "异常");
 										}
 									}
 								}
@@ -133,9 +133,9 @@ public class RunCql {
 						}
 					}
 				}
-				j ++;
+				linepre ++;
 			}
-			i ++;
+			linereg ++;
 		}
 		driver.close();
 	}
