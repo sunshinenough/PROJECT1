@@ -39,6 +39,13 @@ public class ReadExcel {
 			e.printStackTrace();
 		}
 	}
+	public Map<String,String> sortExcel(String dir,int a)throws IOException{
+		XSSFWorkbook workbook = new XSSFWorkbook(dir);
+		XSSFSheet sheet = workbook.getSheetAt(0);
+		Map<String, String> map = new HashMap<>();
+		
+		return map;
+	}
 	public LinkedList<Map<String, String>> readExcel(String dir) throws IOException{
 		
 		
@@ -51,6 +58,7 @@ public class ReadExcel {
 //					System.out.println(value);
 //				}
 //			}
+		
 		
 		int lastRowNum = sheet.getLastRowNum();
 		int lastCellNum = sheet.getRow(0).getLastCellNum();
@@ -82,14 +90,6 @@ public class ReadExcel {
 				
 			}
 		}
-		/*
-		for(int i = 0; i < pres.length; i++) {
-			for(int j = 0; j < pres[i].length; j++) {
-				System.out.print(pres[i][j] + " ");
-			}
-			System.out.println();
-		}
-		*/
 		
 		workbook.close();
 		//释放掉二维数组

@@ -45,8 +45,9 @@ public class RunCql {
 		LinkedList<Map<String, String>> prelist = null;
 		LinkedList<Map<String, String>> reglist = null;
 		try {
-			prelist = new ReadExcel().readExcel(preDir);
 			reglist = new ReadExcel().readExcel(regDir);
+			prelist = new ReadExcel().readExcel(preDir);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -103,35 +104,32 @@ public class RunCql {
 					if(cqlmain[0].equals("1")){
 						
 						//以后会改为：业务数据中的表头各项内容
-						if(cqlmain[2].equals("ItemName")){
-							String cqltype1 = createCql.createType1(cqlmain, itemname);
-							StatementResult result = session.run(cqltype1);
-							if(result.hasNext()){
-								String[] rule = result.next().values().toString().replace("\"", "").replace("[", "").replace("]", "").replace(" ", "").split(",");
-								System.out.println("处方：" + precode + cqlmain[2] + itemname + rule[0] + "异常");
-							}
+						String cqltype1 = createCql.createType1(cqlmain, prelist.get(linepre).get(cqlmain[2]));
+						StatementResult result = session.run(cqltype1);
+						if(result.hasNext()){
+							String[] rule = result.next().values().toString().replace("\"", "").replace("[", "").replace("]", "").replace(" ", "").split(",");
+							System.out.println("处方：" + precode + cqlmain[2] + itemname + rule[0] + "异常");
 						}
+						
 					}
 
 					if(cqlmain[0].equals("2")){
-						if(cqlmain[2].equals("ItemCode")){
-							String cqltype2 = createCql.createType2(cqlmain, itemcode);
-//							System.out.println(cqltype2);
-							StatementResult result = session.run(cqltype2);
-							if(result.hasNext()){
-								//获取药品限定价格
-								Record record2= result.next();
-								String recordtype2 = record2.values().toString().replace("\"", "").replace("[", "").replace("]", "");
-								String[] rectype2 = recordtype2.split(",");
-								if(cqlmain[5].equals("PRICE")){
-									if(cqlmain[6].equals("<=")){
-										if(price > Double.parseDouble(rectype2[1])){
-											System.out.println("门诊登记号： "+ precode + " 药品编号：" + itemcode + " 限定价格： " + rectype2[1] + rectype2[0] + "异常");
-										}
+						String cqltype2 = createCql.createType2(cqlmain, prelist.get(linepre).get(cqlmain[2]));
+						StatementResult result = session.run(cqltype2);
+						if(result.hasNext()){
+							//获取药品限定价格
+							Record record2= result.next();
+							String recordtype2 = record2.values().toString().replace("\"", "").replace("[", "").replace("]", "");
+							String[] rectype2 = recordtype2.split(",");
+							if(cqlmain[5].equals("PRICE")){
+								if(cqlmain[6].equals("<=")){
+									if(price > Double.parseDouble(rectype2[1])){
+										System.out.println("门诊登记号： "+ precode + " 药品编号：" + itemcode + " 限定价格： " + rectype2[1] + rectype2[0] + "异常");
 									}
 								}
 							}
 						}
+						
 					}
 				}
 				linepre ++;
