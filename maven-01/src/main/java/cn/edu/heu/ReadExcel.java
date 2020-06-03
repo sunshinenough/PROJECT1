@@ -13,6 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.xmlbeans.impl.jam.mutable.MPackage;
 import org.junit.Test;
 import org.neo4j.cypher.internal.compiler.v3_1.codegen.setStaticField;
+import org.neo4j.cypher.internal.frontend.v2_3.ast.functions.Str;
 
 import java.util.HashMap;
 public class ReadExcel {
@@ -24,6 +25,7 @@ public class ReadExcel {
 			
 			LinkedList<Map<String, String>> prelist = new ReadExcel().readExcel(predir);
 			LinkedList<Map<String, String>> reglist = new ReadExcel().readExcel(resdir);
+			/*
 			for(int i = 0;i < prelist.size();i ++){
 				for (Map.Entry<String,String> entry : prelist.get(i).entrySet()) {
 					 
@@ -32,18 +34,49 @@ public class ReadExcel {
 				}
 				
 			}
+			*/
 			String a = "Name";
 			System.out.println(reglist.get(10).get(a));
+			new ReadExcel().mergeMap(sortExcel(predir,"处方表"), sortExcel(resdir,"登记表"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	public Map<String,String> sortExcel(String dir,int a)throws IOException{
+	public  Map<String, String> mergeMap(Map<String, String> map,Map<String, String> map2){
+		for (Map.Entry<String,String> entry : map.entrySet()) {
+		    if(! map2.containsKey(entry.getKey())){
+		    	map2.put(entry.getKey(), entry.getValue());
+		    }
+		}
+		for (Map.Entry<String,String> entry : map2.entrySet()) {
+			 
+		    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+		 
+		}
+		return map2;
+	}
+	public static Map<String,String> sortExcel(String dir,String flag)throws IOException{
 		XSSFWorkbook workbook = new XSSFWorkbook(dir);
 		XSSFSheet sheet = workbook.getSheetAt(0);
 		Map<String, String> map = new HashMap<>();
 		
+		for(int i = 0; i <= 0; i++) {
+			XSSFRow row = sheet.getRow(i);
+			if(row!=null) {
+				
+				int cellNum = row.getLastCellNum();
+				for(int j = 0; j < cellNum; j++) {
+					XSSFCell cell = row.getCell(j);
+					if(cell != null) {
+						String stringCellValue = null;
+						cell.setCellType(Cell.CELL_TYPE_STRING);
+						stringCellValue = cell.getStringCellValue();
+						map.put(stringCellValue, flag);
+					}
+				}
+			}
+		}
 		return map;
 	}
 	public LinkedList<Map<String, String>> readExcel(String dir) throws IOException{
