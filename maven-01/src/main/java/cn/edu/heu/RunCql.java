@@ -9,6 +9,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.xmlbeans.impl.xb.xsdschema.Public;
+import org.neo4j.cypher.internal.compiler.v2_3.executionplan.checkForEagerLoadCsv;
 import org.neo4j.cypher.internal.frontend.v2_3.perty.recipe.Pretty.nestWith;
 import org.neo4j.driver.v1.AuthTokens;
 import org.neo4j.driver.v1.Driver;
@@ -30,6 +31,7 @@ public class RunCql {
 	
 	private static CreateCql createCql = new CreateCql();
 	private static RunCql runCql = new RunCql();
+	private static CheckExcel checkExcel = new CheckExcel();
 	public static void main(String[] args){
 		//上传测试
 		
@@ -44,14 +46,16 @@ public class RunCql {
 //		RunCql runCql = new RunCql();
 		LinkedList<Map<String, String>> prelist = null;
 		LinkedList<Map<String, String>> reglist = null;
+		Map<String, String> checkmap = null;
 		try {
 			reglist = new ReadExcel().readExcel(regDir);
 			prelist = new ReadExcel().readExcel(preDir);
-			
+			checkmap = new ReadExcel().mergeMap(ReadExcel.sortExcel(preDir,"处方表"), ReadExcel.sortExcel(regDir,"登记表"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+//		System.out.println(checkExcel.checkExcel(checkmap, "InstitutionName"));
 		//System.out.println(prelist.length);
 		//不用不读表头，表头被 当成map的key了
 		int linereg = 0;
@@ -102,29 +106,38 @@ public class RunCql {
 				double price =Double.parseDouble(prelist.get(linepre).get("PRICE")); 
 				for(String[] cqlmain : cqlmains){
 					if(cqlmain[0].equals("1")){
-						
+						String translabel2 = null;//获取标签2在表格中所对应的值
+						translabel2 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre, 2);
+//						System.out.println(translabel2);
 						//以后会改为：业务数据中的表头各项内容
-						String cqltype1 = createCql.createType1(cqlmain, prelist.get(linepre).get(cqlmain[2]));
+						String cqltype1 = createCql.createType1(cqlmain, translabel2);
 						StatementResult result = session.run(cqltype1);
 						if(result.hasNext()){
 							String[] rule = result.next().values().toString().replace("\"", "").replace("[", "").replace("]", "").replace(" ", "").split(",");
-							System.out.println("处方：" + precode + cqlmain[2] + itemname + rule[0] + "异常");
+							System.out.println("处方：" + precode + "  " +cqlmain[2] + ": " +itemname + rule[0] + "异常");
 						}
 						
 					}
 
 					if(cqlmain[0].equals("2")){
-						String cqltype2 = createCql.createType2(cqlmain, prelist.get(linepre).get(cqlmain[2]));
+						String translabel2 = null;//获取标签2在表格中所对应的值
+						translabel2 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre, 2);
+						//获取judgedata在业务数据中对应的值,judgdata 在 cqlmain中序号为5
+						String transjudgdata = null;
+						transjudgdata = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre, 5);
+//						transjudgdata = prelist.get(linepre).get(cqlmain[2]);
+//						System.out.println(transjudgdata);
+						String cqltype2 = createCql.createType2(cqlmain, translabel2);
 						StatementResult result = session.run(cqltype2);
 						if(result.hasNext()){
 							//获取药品限定价格
 							Record record2= result.next();
 							String recordtype2 = record2.values().toString().replace("\"", "").replace("[", "").replace("]", "");
 							String[] rectype2 = recordtype2.split(",");
-							if(cqlmain[5].equals("PRICE")){
+							if(cqlmain[7].equals("yes")){
 								if(cqlmain[6].equals("<=")){
-									if(price > Double.parseDouble(rectype2[1])){
-										System.out.println("门诊登记号： "+ precode + " 药品编号：" + itemcode + " 限定价格： " + rectype2[1] + rectype2[0] + "异常");
+									if(Double.parseDouble(transjudgdata) > Double.parseDouble(rectype2[1])){
+										System.out.println("处方： "+ precode +"  " + cqlmain[2] + ": " + itemcode +" " + cqlmain[5] + ": " +rectype2[1] + rectype2[0] + "异常");
 									}
 								}
 							}

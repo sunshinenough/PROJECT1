@@ -49,11 +49,11 @@ public class ReadExcel {
 		    	map2.put(entry.getKey(), entry.getValue());
 		    }
 		}
-		for (Map.Entry<String,String> entry : map2.entrySet()) {
-			 
-		    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-		 
-		}
+//		for (Map.Entry<String,String> entry : map2.entrySet()) {
+//			 
+//		    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+//		 
+//		}
 		return map2;
 	}
 	public static Map<String,String> sortExcel(String dir,String flag)throws IOException{
