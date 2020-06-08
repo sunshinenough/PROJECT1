@@ -71,8 +71,10 @@ public class RunCql {
 		LinkedList<String[]> cqlmains = new LinkedList<>();
 		//注意判断字符串是否相等用equals方法
 		int index = 0;
+		//获取语句节点列表
 		String cqltypemain = createCql.createMain();
 		StatementResult resultmain = session.run(cqltypemain);
+		
 		while(resultmain.hasNext()){
 			Record recordMain = resultmain.next();
 			String cqlmaintemp = recordMain.values().toString().replace("\"", "").replace("[", "").replace("]", "").replace(" ", "");
@@ -80,30 +82,28 @@ public class RunCql {
 			index ++;
 			cqlmains.add(cqlmain);
 		}
-
+		//获取要存储MAP的key值
 		LinkedList<String> cqlUnion = new LinkedList<>();
 		cqlUnion = checkExcel.checkCqlUnion(cqlmains);
 		while(linereg < reglist.size()){
 			
-			//定义患者用药、项目列表
+			//定义患者用药、项目列表,待删除
 			String[] itemlist = new String[120];
 			int itemindex = 0;
+			//定义map，放入key值
 			HashMap<String, LinkedList<String>> unionmap = new HashMap<>();
 			for(String cqlunion:cqlUnion){
-				System.out.println(cqlunion);
 				if( ! unionmap.containsKey(cqlunion)){
-					System.out.println("5555555555");
 					LinkedList<String> valuelist = new LinkedList<>();
 					unionmap.put(cqlunion, valuelist);
 				}
 			}
 			while(linepre < prelist.size() && reglist.get(linereg).get("ClinicRegisterCode").equals(prelist.get(linepre).get("ClinicRegisterCode"))){
 				int age = Integer.parseInt(reglist.get(linereg).get("Age"));
-				//System.out.println(age + "000000000");
 				String itemname = prelist.get(linepre).get("ItemName");
 				String precode = prelist.get(linepre).get("PreCode");
 				String itemcode = prelist.get(linepre).get("ItemCode");
-				//填充unionmap
+				//获取全部的key
 				Set<String> keyset = new HashSet<>();
 				keyset = unionmap.keySet();
 				for(String key : keyset){
@@ -111,7 +111,7 @@ public class RunCql {
 						unionmap.get(key).add(prelist.get(linepre).get(key));
 					}
 				}
-				//记录患者用药
+				//记录患者用药，待删除
 				itemlist[itemindex] = itemcode;
 				itemindex ++;
 				
@@ -120,8 +120,6 @@ public class RunCql {
 					if(cqlmain[0].equals("1")){
 						String translabel2 = null;//获取标签2在表格中所对应的值
 						translabel2 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre,linereg, 2);
-//						System.out.println(translabel2);
-						//以后会改为：业务数据中的表头各项内容
 						String cqltype1 = createCql.createType1(cqlmain, translabel2);
 						StatementResult result = session.run(cqltype1);
 						if(result.hasNext()){
@@ -137,8 +135,6 @@ public class RunCql {
 						//获取judgedata在业务数据中对应的值,judgdata 在 cqlmain中序号为5
 						String transjudgdata = null;
 						transjudgdata = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre,linereg, 5);
-//						transjudgdata = prelist.get(linepre).get(cqlmain[2]);
-//						System.out.println(transjudgdata);
 						String cqltype2 = createCql.createType2(cqlmain, translabel2);
 						StatementResult result = session.run(cqltype2);
 						if(result.hasNext()){
@@ -177,31 +173,33 @@ public class RunCql {
 				
 				linepre ++;
 			}
-			//检查unionmap是否正确
-			for(String key : unionmap.keySet()){
-				LinkedList<String> valuelist = new LinkedList<>();
-				valuelist = unionmap.get(key);
-				System.out.println(".....................");
-				for(String value : valuelist){
-					
-					System.out.println(value);
-					
-				}
-				System.out.println(".....................");
-			}
-			//判断相等label
+			//检查unionmap
+//			for(String key : unionmap.keySet()){
+//				LinkedList<String> valuelist = new LinkedList<>();
+//				valuelist = unionmap.get(key);
+////				System.out.println("---------------------");
+//				for(String value : valuelist){
+//					
+//					System.out.println(value);
+//					
+//				}
+//				System.out.println("---------------------");
+//			}
 			for(String[] cqlmain : cqlmains){
 				if(cqlmain[0].equals("3")&&cqlmain[1].equals(cqlmain[2])){
+					LinkedList<String> valuelist = new LinkedList<>();
+					valuelist = unionmap.get(cqlmain[2]);
 					int judgei,judgej;
-					for(judgei = 0;judgei < (itemindex-1);judgei ++){
-						for(judgej = (judgei+1);judgej < itemindex;judgej++){
+					for(judgei = 0;judgei < (valuelist.size()-1);judgei ++){
+						for(judgej = (judgei+1);judgej < valuelist.size();judgej++){
 							//执行查询
-							String cqltype3 = createCql.createTypeThree(itemlist[judgei], itemlist[judgej]);
+							String cqltype3 = createCql.createType3(cqlmain,valuelist.get(judgei), valuelist.get(judgej));
 							StatementResult result = session.run(cqltype3);
 							if(result.hasNext()){
 								Record recordUnion = result.next();
 								String union = recordUnion.values().toString().replace("\"", "").replace("[", "").replace("]", "");
-								System.out.println("登记编号： "+ reglist.get(linereg).get("ClinicRegisterCode") + " 对应的处方中同时使用了药品1：" + itemlist[judgei] + " 药品2： " + itemlist[judgej] + union );
+								System.out.println("登记编号： "+ reglist.get(linereg).get("ClinicRegisterCode") + " " + cqlmain[1] + 
+										": " + valuelist.get(judgei) + " " + cqlmain[2] +": " + itemlist[judgej] + " " + union );
 							}
 						}
 					}
