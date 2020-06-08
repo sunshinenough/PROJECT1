@@ -83,19 +83,28 @@ public class RunCql {
 
 		LinkedList<String> cqlUnion = new LinkedList<>();
 		cqlUnion = checkExcel.checkCqlUnion(cqlmains);
+		/*
 		for(String cqlunion:cqlUnion){
 			System.out.println(cqlunion);
 		}
+<<<<<<< HEAD
+
+=======
+		*/
 
 		while(linereg < reglist.size()){
 			
 			//定义患者用药、项目列表
 			String[] itemlist = new String[120];
 			int itemindex = 0;
+			
 			HashMap<String, LinkedList<String>> unionmap = new HashMap<>();
 			for(String cqlunion:cqlUnion){
+				System.out.println(cqlunion);
 				if( ! unionmap.containsKey(cqlunion)){
-					unionmap.put(cqlunion, new LinkedList<String>());
+					System.out.println("5555555555");
+					LinkedList<String> valuelist = new LinkedList<>();
+					unionmap.put(cqlunion, valuelist);
 				}
 			}
 			while(linepre < prelist.size() && reglist.get(linereg).get("ClinicRegisterCode").equals(prelist.get(linepre).get("ClinicRegisterCode"))){
@@ -108,9 +117,7 @@ public class RunCql {
 				Set<String> keyset = new HashSet<>();
 				keyset = unionmap.keySet();
 				for(String key : keyset){
-					LinkedList<String> valuelist = new LinkedList<>();
-					valuelist = unionmap.get(key);
-					valuelist.add(prelist.get(linepre).get(key));
+					unionmap.get(key).add(prelist.get(linepre).get(key));
 				}
 				//记录患者用药
 				itemlist[itemindex] = itemcode;
@@ -175,18 +182,20 @@ public class RunCql {
 						
 					}
 				}
-				for(String key : keyset){
-					LinkedList<String> valuelist = new LinkedList<>();
-					valuelist = unionmap.get(key);
-					System.out.println(".....................");
-					for(String value : valuelist){
-						
-						System.out.println(value);
-						
-					}
-					System.out.println(".....................");
-				}
+				
 				linepre ++;
+			}
+			//检查unionmap是否正确
+			for(String key : unionmap.keySet()){
+				LinkedList<String> valuelist = new LinkedList<>();
+				valuelist = unionmap.get(key);
+				System.out.println(".....................");
+				for(String value : valuelist){
+					
+					System.out.println(value);
+					
+				}
+				System.out.println(".....................");
 			}
 			//判断相等label
 			for(String[] cqlmain : cqlmains){
