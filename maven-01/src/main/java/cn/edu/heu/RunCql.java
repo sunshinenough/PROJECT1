@@ -24,6 +24,8 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.omg.CORBA.PRIVATE_MEMBER;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
+
 import io.netty.channel.group.ChannelMatcher;
 
 
@@ -78,19 +80,29 @@ public class RunCql {
 			index ++;
 			cqlmains.add(cqlmain);
 		}
-		
+		/*
 		for(int x = 0;x < cqlmains.size();x ++){
 			for(int y = 0;y < 8;y ++){
 				System.out.println(cqlmains.get(x)[y]);
 			}
 		}
-		
+		*/
+		LinkedList<String> cqlUnion = new LinkedList<>();
+		cqlUnion = checkExcel.checkCqlUnion(cqlmains);
+		for(String cqlunion:cqlUnion){
+			System.out.println(cqlunion);
+		}
 		while(linereg < reglist.size()){
 			
 			//定义患者用药、项目列表
 			String[] itemlist = new String[120];
 			int itemindex = 0;
-			
+			HashMap<String, LinkedList<String>> unionmap = new HashMap<>();
+			for(String cqlunion:cqlUnion){
+				if( ! unionmap.containsKey(cqlunion)){
+					unionmap.put(cqlunion, new LinkedList<String>());
+				}
+			}
 			while(linepre < prelist.size() && reglist.get(linereg).get("ClinicRegisterCode").equals(prelist.get(linepre).get("ClinicRegisterCode"))){
 				int age = Integer.parseInt(reglist.get(linereg).get("Age"));
 				//System.out.println(age + "000000000");
@@ -98,13 +110,15 @@ public class RunCql {
 				String precode = prelist.get(linepre).get("PreCode");
 				String itemcode = prelist.get(linepre).get("ItemCode");
 				
-				//记录患者用药
-				
-				LinkedList<String> cqlUnion = new LinkedList<>();
-				cqlUnion = checkExcel.checkCqlUnion(cqlmains);
-				for(String cqlunion:cqlUnion){
-					System.out.println(cqlunion);
+				//填充unionmap
+				Set<String> keyset = new HashSet<>();
+				keyset = unionmap.keySet();
+				for(String key : keyset){
+					LinkedList<String> valuelist = new LinkedList<>();
+					valuelist = unionmap.get(key);
+					valuelist.add(prelist.get(linepre).get(key));
 				}
+				//记录患者用药
 				itemlist[itemindex] = itemcode;
 				itemindex ++;
 				
@@ -166,6 +180,17 @@ public class RunCql {
 					if(cqlmain[0].equals("3")&&cqlmain[1].equals(cqlmain[2])){
 						
 					}
+				}
+				for(String key : keyset){
+					LinkedList<String> valuelist = new LinkedList<>();
+					valuelist = unionmap.get(key);
+					System.out.println(".....................");
+					for(String value : valuelist){
+						
+						System.out.println(value);
+						
+					}
+					System.out.println(".....................");
 				}
 				linepre ++;
 			}
