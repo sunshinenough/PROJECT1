@@ -85,6 +85,12 @@ public class RunCql {
 			}
 		}
 		
+		LinkedList<String> cqlUnion = new LinkedList<>();
+		cqlUnion = checkExcel.checkCqlUnion(cqlmains);
+		for(String cqlunion:cqlUnion){
+			System.out.println(cqlunion);
+		}
+		
 		while(linereg < reglist.size()){
 			
 			//定义患者用药、项目列表
@@ -100,11 +106,7 @@ public class RunCql {
 				
 				//记录患者用药
 				
-				LinkedList<String> cqlUnion = new LinkedList<>();
-				cqlUnion = checkExcel.checkCqlUnion(cqlmains);
-				for(String cqlunion:cqlUnion){
-					System.out.println(cqlunion);
-				}
+				
 				itemlist[itemindex] = itemcode;
 				itemindex ++;
 				
