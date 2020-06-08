@@ -80,22 +80,7 @@ public class RunCql {
 			index ++;
 			cqlmains.add(cqlmain);
 		}
-		/*
-		for(int x = 0;x < cqlmains.size();x ++){
-			for(int y = 0;y < 8;y ++){
-				System.out.println(cqlmains.get(x)[y]);
-			}
-		}
-<<<<<<< HEAD
-		
-		LinkedList<String> cqlUnion = new LinkedList<>();
-		cqlUnion = checkExcel.checkCqlUnion(cqlmains);
-		for(String cqlunion:cqlUnion){
-			System.out.println(cqlunion);
-		}
-		
-=======
-		*/
+
 		LinkedList<String> cqlUnion = new LinkedList<>();
 		cqlUnion = checkExcel.checkCqlUnion(cqlmains);
 		for(String cqlunion:cqlUnion){
