@@ -100,10 +100,10 @@ public class RunCql {
 				
 				//记录患者用药
 				
-				for(String[] cqlmain : cqlmains){
-					if((cqlmain[0].equals("3")&&cqlmain[1].equals(cqlmain[2]))||(cqlmain[0].equals("2")&&cqlmain[5].equals("sum"))){
-						
-					}
+				LinkedList<String> cqlUnion = new LinkedList<>();
+				cqlUnion = checkExcel.checkCqlUnion(cqlmains);
+				for(String cqlunion:cqlUnion){
+					System.out.println(cqlunion);
 				}
 				itemlist[itemindex] = itemcode;
 				itemindex ++;
