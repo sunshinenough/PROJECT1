@@ -31,13 +31,20 @@ public class CreateCql {
 	}
 	public String createTypeThree(String itemCode,String itemCode2){
 		
-		String cql = "MATCH (m:objectCode)-[r:relation]->(n:objectCode) where n.Code ='" + itemCode + "'and m.Code = '" + itemCode2 + "' return r.relation";
+		String cql = "MATCH (m:ItemCode)-[r:relation]->(n:ItemCode) where n.name ='" + itemCode + "'and m.name = '" + itemCode2 + "' return r.relation";
 		
 		//药品名来判断，备选
 //		String cql = "MATCH (m:object)-[r:relation]->(n:object) where n.Name ='" + itemCode + "'and m.Name = '" + itemCode2 + "' return r.relation";
 		
 		return cql;	
 		
+	}
+	public String createType3(String[] strings,String sent1,String sent2){
+		if(strings.length != 0 || strings == null){
+			String cql = "MATCH (m:" + strings[1] + ")-[r:relation]->(n:" + strings[2] + ") where n.name ='" + sent1 + "'and m.name = '" + sent2 + "' return r.relation";
+			return cql;
+		}
+		return null;
 	}
 	public String createMain(){
 //		语句生成

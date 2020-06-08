@@ -100,6 +100,11 @@ public class RunCql {
 				
 				//记录患者用药
 				
+				for(String[] cqlmain : cqlmains){
+					if((cqlmain[0].equals("3")&&cqlmain[1].equals(cqlmain[2]))||(cqlmain[0].equals("2")&&cqlmain[5].equals("sum"))){
+						
+					}
+				}
 				itemlist[itemindex] = itemcode;
 				itemindex ++;
 				
@@ -107,7 +112,7 @@ public class RunCql {
 				for(String[] cqlmain : cqlmains){
 					if(cqlmain[0].equals("1")){
 						String translabel2 = null;//获取标签2在表格中所对应的值
-						translabel2 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre, 2);
+						translabel2 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre,linereg, 2);
 //						System.out.println(translabel2);
 						//以后会改为：业务数据中的表头各项内容
 						String cqltype1 = createCql.createType1(cqlmain, translabel2);
@@ -121,10 +126,10 @@ public class RunCql {
 
 					if(cqlmain[0].equals("2")){
 						String translabel2 = null;//获取标签2在表格中所对应的值
-						translabel2 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre, 2);
+						translabel2 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre,linereg, 2);
 						//获取judgedata在业务数据中对应的值,judgdata 在 cqlmain中序号为5
 						String transjudgdata = null;
-						transjudgdata = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre, 5);
+						transjudgdata = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre,linereg, 5);
 //						transjudgdata = prelist.get(linepre).get(cqlmain[2]);
 //						System.out.println(transjudgdata);
 						String cqltype2 = createCql.createType2(cqlmain, translabel2);
@@ -144,8 +149,43 @@ public class RunCql {
 						}
 						
 					}
+					if(cqlmain[0].equals("3")&&(!cqlmain[1].equals(cqlmain[2]))){
+						String translabel1 = null,translabel2 = null;
+						translabel1 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre,linereg, 1);
+						translabel2 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre,linereg, 2);
+						String cqltype3 = createCql.createType3(cqlmain,translabel1,translabel2);
+//						if(translabel1.equals("472.101")&&translabel2.equals("Z-C01AA-X0186-32")){
+//							System.out.println(cqltype3);
+//						}
+						StatementResult result = session.run(cqltype3);
+						if(result.hasNext()){
+							String[] rule = result.next().values().toString().replace("\"", "").replace("[", "").replace("]", "").replace(" ", "").split(",");
+							System.out.println("处方：" + precode + "  " +cqlmain[1] + ": " +translabel1 + " " + cqlmain[2] + ": " +translabel2 +" " + rule[0] + " 异常");
+						}
+					}
+					if(cqlmain[0].equals("3")&&cqlmain[1].equals(cqlmain[2])){
+						
+					}
 				}
 				linepre ++;
+			}
+			//判断相等label
+			for(String[] cqlmain : cqlmains){
+				if(cqlmain[0].equals("3")&&cqlmain[1].equals(cqlmain[2])){
+					int judgei,judgej;
+					for(judgei = 0;judgei < (itemindex-1);judgei ++){
+						for(judgej = (judgei+1);judgej < itemindex;judgej++){
+							//执行查询
+							String cqltype3 = createCql.createTypeThree(itemlist[judgei], itemlist[judgej]);
+							StatementResult result = session.run(cqltype3);
+							if(result.hasNext()){
+								Record recordUnion = result.next();
+								String union = recordUnion.values().toString().replace("\"", "").replace("[", "").replace("]", "");
+								System.out.println("登记编号： "+ reglist.get(linereg).get("ClinicRegisterCode") + " 对应的处方中同时使用了药品1：" + itemlist[judgei] + " 药品2： " + itemlist[judgej] + union );
+							}
+						}
+					}
+				}
 			}
 			linereg ++;
 		}
