@@ -94,12 +94,13 @@ public class RunCql {
 			System.out.println(cqlunion);
 		}
 		*/
+		
+		
 		while(linereg < reglist.size()){
 			
 			//定义患者用药、项目列表
 			String[] itemlist = new String[120];
 			int itemindex = 0;
-			
 			HashMap<String, LinkedList<String>> unionmap = new HashMap<>();
 			for(String cqlunion:cqlUnion){
 				System.out.println(cqlunion);
@@ -120,7 +121,9 @@ public class RunCql {
 				Set<String> keyset = new HashSet<>();
 				keyset = unionmap.keySet();
 				for(String key : keyset){
-					unionmap.get(key).add(prelist.get(linepre).get(key));
+					if( ! prelist.get(linepre).get(key).equals("")){
+						unionmap.get(key).add(prelist.get(linepre).get(key));
+					}
 				}
 				//记录患者用药
 				itemlist[itemindex] = itemcode;
