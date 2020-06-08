@@ -34,6 +34,7 @@ public class RunCql {
 	private static CreateCql createCql = new CreateCql();
 	private static RunCql runCql = new RunCql();
 	private static CheckExcel checkExcel = new CheckExcel();
+	private WriteLog writeLog = new WriteLog();
 	public static void main(String[] args){
 		//上传测试
 		
@@ -88,6 +89,7 @@ public class RunCql {
 		while(linereg < reglist.size()){
 			
 			//定义患者用药、项目列表,待删除
+			String regcode = reglist.get(linereg).get("ClinicRegisterCode");
 			String[] itemlist = new String[120];
 			int itemindex = 0;
 			//定义map，放入key值
@@ -123,12 +125,11 @@ public class RunCql {
 						String cqltype1 = createCql.createType1(cqlmain, translabel2);
 						StatementResult result = session.run(cqltype1);
 						if(result.hasNext()){
-							String[] rule = result.next().values().toString().replace("\"", "").replace("[", "").replace("]", "").replace(" ", "").split(",");
-							System.out.println("处方：" + precode + "  " +cqlmain[2] + ": " +itemname + rule[0] + "异常");
+							writeLog.writeLogType1(result, cqlmain, translabel2, precode);
 						}
 						
 					}
-
+					
 					if(cqlmain[0].equals("2")){
 						String translabel2 = null;//获取标签2在表格中所对应的值
 						translabel2 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre,linereg, 2);
@@ -139,23 +140,7 @@ public class RunCql {
 						StatementResult result = session.run(cqltype2);
 						if(result.hasNext()){
 							//获取药品限定价格
-							Record record2= result.next();
-							String recordtype2 = record2.values().toString().replace("\"", "").replace("[", "").replace("]", "");
-							String[] rectype2 = recordtype2.split(",");
-							if(cqlmain[7].equals("yes")){
-								if(cqlmain[6].equals("<=")){
-									if(Double.parseDouble(transjudgdata) > Double.parseDouble(rectype2[1])){
-										System.out.println("处方： "+ precode +"  " + cqlmain[2] + ": " + translabel2 +" " + cqlmain[5]
-												+ ": " + transjudgdata + " "+ rectype2[0]);
-									}
-								}
-								if(cqlmain[6].equals("equals")){
-									if(!transjudgdata.equals(rectype2[1])){
-										System.out.println("处方： "+ precode +"  " + cqlmain[2] + ": " + translabel2 +" " + cqlmain[5]
-												+ ": " + transjudgdata + " " + rectype2[0] );
-									}
-								}
-							}
+							writeLog.writeLogType2(result, cqlmain, translabel2, precode, transjudgdata);
 						}
 						
 					}
@@ -164,34 +149,16 @@ public class RunCql {
 						translabel1 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre,linereg, 1);
 						translabel2 = checkExcel.getTranslabel(prelist, reglist, cqlmain, checkmap, linepre,linereg, 2);
 						String cqltype3 = createCql.createType3(cqlmain,translabel1,translabel2);
-//						if(translabel1.equals("472.101")&&translabel2.equals("Z-C01AA-X0186-32")){
-//							System.out.println(cqltype3);
-//						}
 						StatementResult result = session.run(cqltype3);
 						if(result.hasNext()){
-							String[] rule = result.next().values().toString().replace("\"", "").replace("[", "").replace("]", "").replace(" ", "").split(",");
-							System.out.println("处方：" + precode + "  " +cqlmain[1] + ": " +translabel1 + " " + cqlmain[2] + ": " +translabel2 +" " + rule[0] + " 异常");
+							writeLog.writeLogType3(result, cqlmain,translabel1,translabel2, precode);
 						}
-					}
-					if(cqlmain[0].equals("3")&&cqlmain[1].equals(cqlmain[2])){
-						
 					}
 				}
 				
 				linepre ++;
 			}
-			//检查unionmap
-//			for(String key : unionmap.keySet()){
-//				LinkedList<String> valuelist = new LinkedList<>();
-//				valuelist = unionmap.get(key);
-////				System.out.println("---------------------");
-//				for(String value : valuelist){
-//					
-//					System.out.println(value);
-//					
-//				}
-//				System.out.println("---------------------");
-//			}
+
 			for(String[] cqlmain : cqlmains){
 				if(cqlmain[0].equals("3")&&cqlmain[1].equals(cqlmain[2])){
 					LinkedList<String> valuelist = new LinkedList<>();
@@ -203,10 +170,7 @@ public class RunCql {
 							String cqltype3 = createCql.createType3(cqlmain,valuelist.get(judgei), valuelist.get(judgej));
 							StatementResult result = session.run(cqltype3);
 							if(result.hasNext()){
-								Record recordUnion = result.next();
-								String union = recordUnion.values().toString().replace("\"", "").replace("[", "").replace("]", "");
-								System.out.println("登记编号： "+ reglist.get(linereg).get("ClinicRegisterCode") + " " + cqlmain[1] + 
-										": " + valuelist.get(judgei) + " " + cqlmain[2] +": " + itemlist[judgej] + " " + union );
+								writeLog.writeLogType3(result, cqlmain, valuelist.get(judgei), valuelist.get(judgej),regcode);
 							}
 						}
 					}

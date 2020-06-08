@@ -29,6 +29,7 @@ public class CheckExcel {
 		}
 		return translabel;
 	}
+	//用于存储列表的定义
 	public LinkedList<String> checkCqlUnion(LinkedList<String[]> cqlmains){
 		LinkedList<String> cqlUnion = new LinkedList<>();
 		for(String[] cqlmain : cqlmains){
