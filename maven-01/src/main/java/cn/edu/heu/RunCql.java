@@ -80,22 +80,9 @@ public class RunCql {
 			index ++;
 			cqlmains.add(cqlmain);
 		}
-		/*
-		for(int x = 0;x < cqlmains.size();x ++){
-			for(int y = 0;y < 8;y ++){
-				System.out.println(cqlmains.get(x)[y]);
-			}
-		}
-		*/
+
 		LinkedList<String> cqlUnion = new LinkedList<>();
 		cqlUnion = checkExcel.checkCqlUnion(cqlmains);
-		/*
-		for(String cqlunion:cqlUnion){
-			System.out.println(cqlunion);
-		}
-		*/
-		
-		
 		while(linereg < reglist.size()){
 			
 			//定义患者用药、项目列表
@@ -116,7 +103,6 @@ public class RunCql {
 				String itemname = prelist.get(linepre).get("ItemName");
 				String precode = prelist.get(linepre).get("PreCode");
 				String itemcode = prelist.get(linepre).get("ItemCode");
-				
 				//填充unionmap
 				Set<String> keyset = new HashSet<>();
 				keyset = unionmap.keySet();
