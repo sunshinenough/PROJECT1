@@ -19,8 +19,34 @@ public class WriteLog {
 							+ "：" + transjudgdata + " "+ rectype2[0]);
 				}
 			}
+			if(cqlmain[6].equals(">=")){
+				if(Double.parseDouble(transjudgdata) < Double.parseDouble(rectype2[1])){
+					System.out.println("处方： "+ precode +"  " + cqlmain[2] + "：" + translabel2 +" " + cqlmain[5]
+							+ "：" + transjudgdata + " "+ rectype2[0]);
+				}
+			}
 			if(cqlmain[6].equals("equals")){
 				if(!transjudgdata.equals(rectype2[1])){
+					System.out.println("处方："+ precode +"  " + cqlmain[2] + "：" + translabel2 +" " + cqlmain[5]
+							+ "：" + transjudgdata + " " + rectype2[0] );
+				}
+			}
+		}
+		if(cqlmain[7].equals("no")){
+			if(cqlmain[6].equals("<=")){
+				if(Double.parseDouble(transjudgdata) < Double.parseDouble(rectype2[1])||Double.parseDouble(transjudgdata) == Double.parseDouble(rectype2[1])){
+					System.out.println("处方： "+ precode +"  " + cqlmain[2] + "：" + translabel2 +" " + cqlmain[5]
+							+ "：" + transjudgdata + " "+ rectype2[0]);
+				}
+			}
+			if(cqlmain[6].equals(">=")){
+				if(Double.parseDouble(transjudgdata) > Double.parseDouble(rectype2[1])||Double.parseDouble(transjudgdata) == Double.parseDouble(rectype2[1])){
+					System.out.println("处方： "+ precode +"  " + cqlmain[2] + "：" + translabel2 +" " + cqlmain[5]
+							+ "：" + transjudgdata + " "+ rectype2[0]);
+				}
+			}
+			if(cqlmain[6].equals("equals")){
+				if(transjudgdata.equals(rectype2[1])){
 					System.out.println("处方："+ precode +"  " + cqlmain[2] + "：" + translabel2 +" " + cqlmain[5]
 							+ "：" + transjudgdata + " " + rectype2[0] );
 				}
